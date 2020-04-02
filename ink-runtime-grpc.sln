@@ -1,0 +1,22 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ink-runtime-grpc", "ink-runtime-grpc.csproj", "{7F38AA6B-19DB-4701-B874-9D9193C54E29}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{60DDE9B6-BDEB-4C37-BE2B-D4D53563D445}"
+	ProjectSection(SolutionItems) = preProject
+		Client.cs = Client.cs
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7F38AA6B-19DB-4701-B874-9D9193C54E29}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7F38AA6B-19DB-4701-B874-9D9193C54E29}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7F38AA6B-19DB-4701-B874-9D9193C54E29}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7F38AA6B-19DB-4701-B874-9D9193C54E29}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

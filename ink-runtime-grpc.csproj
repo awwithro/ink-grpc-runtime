@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <RootNamespace>ink_runtime_grpc</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Grpc" Version="2.27.0" />
+    <PackageReference Include="Grpc.Core" Version="2.27.0" />
+    <PackageReference Include="Grpc.Tools" Version="2.27.0">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Google.Protobuf" Version="3.11.4" />
+    <PackageReference Include="Ink.Engine.Runtime-Unofficial" Version="0.9.0-nightly-20022411" />
+    <PackageReference Include="Google.Api.CommonProtos" Version="2.0.0" />
+    <PackageReference Include="Google.Apis" Version="1.44.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <Protobuf Include="Story.proto" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="google\" />
+    <Folder Include="google\api\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Main.cs" />
+  </ItemGroup>
+</Project>
