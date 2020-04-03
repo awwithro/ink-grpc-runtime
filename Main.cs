@@ -20,14 +20,9 @@ namespace ink_runtime_grpc
             Thread.Sleep(1);
             Console.WriteLine("Greeter server listening on port " + Port);
 
-            InkClient.Run();
-
-
-            Console.WriteLine("Press any key to stop the server...");
-            Console.ReadKey();
-
+            
+            Thread.Sleep(Timeout.Infinite);
             server.ShutdownAsync().Wait();
-
         }
     }
 }

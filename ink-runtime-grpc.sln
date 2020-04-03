@@ -5,7 +5,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ink-runtime-grpc", "ink-run
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{60DDE9B6-BDEB-4C37-BE2B-D4D53563D445}"
 	ProjectSection(SolutionItems) = preProject
-		Client.cs = Client.cs
+		Main.cs = Main.cs
 	EndProjectSection
 EndProject
 Global

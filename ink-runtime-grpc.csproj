@@ -25,7 +25,4 @@
     <Folder Include="google\" />
     <Folder Include="google\api\" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Remove="Main.cs" />
-  </ItemGroup>
 </Project>
