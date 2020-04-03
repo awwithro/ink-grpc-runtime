@@ -17,10 +17,8 @@ namespace ink_runtime_grpc
                 Ports = { new ServerPort("localhost", Port, ServerCredentials.Insecure) }
             };
             server.Start();
-            Thread.Sleep(1);
             Console.WriteLine("Greeter server listening on port " + Port);
 
-            
             Thread.Sleep(Timeout.Infinite);
             server.ShutdownAsync().Wait();
         }
