@@ -1,12 +1,18 @@
 ﻿syntax = "proto3";
 import "google/protobuf/struct.proto";
+import "google/protobuf/empty.proto";
 package InkGRPC;
 option go_package = "pkg/inkgrpc";
 
 service Story {
+  // Creates and starts a brand new story from the provided ink in json from
   rpc NewStory (NewStoryRequest) returns (NewStoryReply);
+  // Starts an existing story the server already knows about
+  rpc StartStory(StartStoryRequest) returns(NewStoryReply);
+  rpc ListStories(google.protobuf.Empty) returns (ListStoriesReply);
   rpc Continue (ContinueRequest) returns (ContinueReply);
   rpc ChooseChoice (ChooseChoiceRequest) returns (ChooseChoiceReply);
+  rpc ChoosePathString(ChoosePathStringRequest) returns(google.protobuf.Empty);
 }
 
 message NewStoryRequest {
@@ -45,4 +51,17 @@ message StoryState{
 message Choice{
     int32 index = 1;
     string text = 2;
+}
+
+message ListStoriesReply{
+    repeated string storyTitles = 1;
+}
+
+message StartStoryRequest{
+    string storyTitle = 1;
+}
+message ChoosePathStringRequest{
+    string id = 1;
+    string path = 2;
+    bool resetCallstack = 3;
 }

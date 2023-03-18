@@ -1,22 +1,26 @@
 ﻿using System.Threading.Tasks;
 using Grpc.Core;
-using Ink.Runtime;
+using Google.Protobuf.WellKnownTypes;
 using System.Collections.Generic;
 using System;
 using InkGRPC;
 
 namespace ink_runtime_grpc
 {
-        class ServerImpl : InkGRPC.Story.StoryBase
+    class InkServer : Story.StoryBase
+    {
+        // contains a Dictionary of Guids to stories
+        private Dictionary<string, Ink.Runtime.Story> runningStories;
+        // dictionary of story titles to ink json
+        private Dictionary<string, string> stories;
+        private string storyPath;
+        public InkServer(string StoryPath)
         {
-        // stories contains a Dictionary of Guids to stories
-        private Dictionary<string, Ink.Runtime.Story> stories;
-
-        public ServerImpl()
-        {
-            stories = new Dictionary<string, Ink.Runtime.Story>();
+            runningStories = new Dictionary<string, Ink.Runtime.Story>();
+            stories = new Dictionary<string, string>();
+            storyPath = StoryPath;
         }
-        
+
         public override Task<NewStoryReply> NewStory(NewStoryRequest request, ServerCallContext context)
         {
             string guid = Guid.NewGuid().ToString();
@@ -25,31 +29,86 @@ namespace ink_runtime_grpc
             try
             {
                 newStory = new Ink.Runtime.Story(json);
-                stories.Add(guid, newStory);
+                
+                runningStories.Add(guid, newStory);
                 return Task.FromResult(new NewStoryReply { Id = guid });
             }
             catch (Exception e)
             {
-                throw new RpcException(new Status(StatusCode.InvalidArgument, "Unable to create story: "+ e.Message));
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "Unable to create story: " + e.Message));
             }
-            
-        }
 
-        
-        public override Task<ContinueReply> Continue(ContinueRequest request, ServerCallContext context)
+        }
+        public override Task<NewStoryReply> StartStory(StartStoryRequest request, ServerCallContext context)
+        {
+            string guid = Guid.NewGuid().ToString();
+            Ink.Runtime.Story newStory;
+            try
+            {
+                newStory = new Ink.Runtime.Story(stories[request.StoryTitle]);
+                runningStories.Add(guid, newStory);
+                return Task.FromResult(new NewStoryReply { Id = guid });
+            }
+            catch (Exception e)
+            {
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "Unable to start story: " + e.Message));
+            }
+
+        }
+        public override Task<ListStoriesReply> ListStories(Empty request, ServerCallContext context)
         {
 
-            Ink.Runtime.Story story = stories[request.Id];
-
-            var storyState = MarshalStoryState(story);
-            return Task.FromResult(new ContinueReply { Story=storyState });
+            try
+            {
+                var reply = new ListStoriesReply();
+                foreach (string title in stories.Keys)
+                {
+                    reply.StoryTitles.Add(title);
+                }
+                return Task.FromResult(reply);
+            }
+            catch (Exception e)
+            {
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "Unable to list story: " + e.Message));
+            }
 
         }
+
+
+        public override Task<ContinueReply> Continue(ContinueRequest request, ServerCallContext context)
+        {
+            try
+            {
+                Ink.Runtime.Story story = runningStories[request.Id];
+                var storyState = MarshalStoryState(story);
+                return Task.FromResult(new ContinueReply { Story = storyState });
+            }
+            catch (Exception e)
+            {
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "Unable to continue story: " + e.Message));
+            }
+
+        }
+        public override Task<Empty> ChoosePathString(ChoosePathStringRequest request, ServerCallContext context)
+        {
+            try
+            {
+                Ink.Runtime.Story story = runningStories[request.Id];
+                story.ChoosePathString(request.Path, request.ResetCallstack);
+                return Task.FromResult(new Empty());
+            }
+            catch (Exception e)
+            {
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "Unable to continue story: " + e.Message));
+            }
+
+        }
+
 
         public override Task<ChooseChoiceReply> ChooseChoice(ChooseChoiceRequest request, ServerCallContext context)
         {
 
-            Ink.Runtime.Story story = stories[request.Id];
+            Ink.Runtime.Story story = runningStories[request.Id];
             var success = false;
             try
             {
@@ -68,7 +127,7 @@ namespace ink_runtime_grpc
             var state = new InkGRPC.StoryState();
             state.Text = story.Continue();
             state.CanContinue = story.canContinue;
-            foreach(Ink.Runtime.Choice choice in story.currentChoices)
+            foreach (Ink.Runtime.Choice choice in story.currentChoices)
             {
                 state.Choices.Add(new InkGRPC.Choice { Index = choice.index, Text = choice.text });
             }
@@ -76,13 +135,31 @@ namespace ink_runtime_grpc
             {
                 state.CurrentTags.Add(tag);
             }
-            foreach (string tag in story.globalTags)
+            if (story.globalTags != null)
             {
-                state.GlobalTags.Add(tag);
+                foreach (string tag in story.globalTags)
+                {
+                    state.GlobalTags.Add(tag);
+                }
             }
             return state;
         }
-           
+
+
+
+        public int LoadStories()
+        {
+            var files = System.IO.Directory.GetFiles(storyPath, "*.json");
+            int loadedFiles = 0;
+            foreach (string file in files)
+            {
+                string title = System.IO.Path.GetFileNameWithoutExtension(file);
+                string story = System.IO.File.ReadAllText(file);
+                loadedFiles +=1;
+                stories[title] = story;
+            }
+            return loadedFiles;
         }
+    }
 
    }
